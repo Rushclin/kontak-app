@@ -1,8 +1,23 @@
 import styled from "@emotion/styled";
-import { Button, Divider, Grid, Paper, Typography } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  Grid,
+  Modal,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Box, Stack } from "@mui/system";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import React from "react";
+import CustumInput from "../components/CustumInput";
+import { styles } from "./AddContact";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
@@ -38,6 +53,24 @@ const rows = [
 ];
 
 const ContactScreen = () => {
+  const [showDialog, setShowDialog] = React.useState(false);
+
+  const [contact, setContact] = React.useState({
+    nom: "",
+    prenom: "",
+    email: "",
+    naissance: undefined,
+    pere: undefined,
+    mere: undefined,
+  });
+
+  const handleChange = (e: any) => {
+    setContact((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   return (
     <React.Fragment>
       <Box
@@ -61,7 +94,9 @@ const ContactScreen = () => {
           <Typography variant="h4" fontWeight={800}>
             Kontak.
           </Typography>
-          <Button variant="contained">New contact</Button>
+          <Button variant="contained" onClick={() => setShowDialog(true)}>
+            New contact
+          </Button>
         </Stack>
         <Divider light />
 
@@ -79,6 +114,69 @@ const ContactScreen = () => {
           />
         </Box>
       </Box>
+
+      <Dialog
+        fullWidth={true}
+        open={showDialog}
+        onClose={() => setShowDialog(false)}
+        sx={{ width: "100%" }}
+      >
+        <DialogTitle>Creer un contact</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Entrez les informations necessaires
+          </DialogContentText>
+
+          <CustumInput
+            value={contact.nom}
+            id="nom"
+            label="Nom"
+            type="text"
+            name="nom"
+            onChangeText={handleChange}
+          />
+          <CustumInput
+            value={contact.prenom}
+            id="prenom"
+            label="Prenom"
+            type="text"
+            name="prenom"
+            onChangeText={handleChange}
+          />
+          <CustumInput
+            value={contact.naissance}
+            id="naissance"
+            label="Date de naissance"
+            type="date"
+            name="date"
+            onChangeText={handleChange}
+          />
+          <CustumInput
+            value={contact.email}
+            id="email"
+            label="Email"
+            type="email"
+            name="email"
+            onChangeText={handleChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => setShowDialog(false)}
+          >
+            Annuler
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setShowDialog(false)}
+          >
+            Enregistrer
+          </Button>
+        </DialogActions>
+      </Dialog>
     </React.Fragment>
   );
 };
