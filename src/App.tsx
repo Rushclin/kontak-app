@@ -12,21 +12,18 @@ function App() {
     //     console.log(response);
     //   })
     //   .catch((error) => console.log(error));
-
-    instance
-      .post("/contact", { id: 1, name: "Takam" })
-      .then((response) => console.log(response.data))
-      .catch((error) => console.log(error));
-
-    instance
-      .get("/contact", { params: { id: 0 } })
-      .then((response) => console.log(response.data))
-      .catch((error) => console.log(error));
-
-    instance
-      .delete("/contact", { params: { id: 0 } })
-      .then((response) => console.log("APRES SUPPRESSION ", response.data))
-      .catch((error) => console.log(error));
+    // instance
+    //   .post("/contact", { id: 1, name: "Takam" })
+    //   .then((response) => console.log(response.data))
+    //   .catch((error) => console.log(error));
+    // instance
+    //   .get("/contact", { params: { id: 0 } })
+    //   .then((response) => console.log(response.data))
+    //   .catch((error) => console.log(error));
+    // instance
+    //   .delete("/contact", { params: { id: 0 } })
+    //   .then((response) => console.log("APRES SUPPRESSION ", response.data))
+    //   .catch((error) => console.log(error));
   }, []);
 
   return (

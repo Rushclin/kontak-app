@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  ButtonGroup,
   Dialog,
   DialogActions,
   DialogContent,
@@ -8,52 +9,67 @@ import {
   DialogTitle,
   Divider,
   Grid,
+  IconButton,
   Modal,
   Paper,
   TextField,
   Typography,
 } from "@mui/material";
+
+import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box, Stack } from "@mui/system";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridValueGetterParams,
+  renderActionsCell,
+} from "@mui/x-data-grid";
 import React from "react";
 import CustumInput from "../components/CustumInput";
-import { styles } from "./AddContact";
+import instance from "../__mock__/api";
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "firstName", headerName: "First name", width: 130 },
-  { field: "lastName", headerName: "Last name", width: 130 },
+  { field: "id", headerName: "ID", width: 10 },
+  { field: "nom", headerName: "NOM", width: 200 },
+  { field: "prenom", headerName: "PRENOM", width: 200 },
+  { field: "email", headerName: "EMAIL", width: 250 },
   {
-    field: "age",
-    headerName: "Age",
-    type: "number",
-    width: 90,
+    field: "actions",
+    headerName: "ACTIONS",
+    renderCell: (params) => {
+      return (
+        <ButtonGroup
+          variant="contained"
+          aria-label="outlined primary button group"
+        >
+          <IconButton
+            aria-label="show"
+            onClick={() => console.log("yui", params?.row?.id)}
+          >
+            <VisibilityIcon fontSize="small" color="primary" />
+          </IconButton>
+          <IconButton aria-label="delete" color="error">
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </ButtonGroup>
+      );
+    },
   },
-  {
-    field: "fullName",
-    headerName: "Full name",
-    description: "This column has a value getter and is not sortable.",
-    sortable: false,
-    width: 160,
-    valueGetter: (params: GridValueGetterParams) =>
-      `${params.row.firstName || ""} ${params.row.lastName || ""}`,
-  },
-];
-
-const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-  { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
 ];
 
 const ContactScreen = () => {
   const [showDialog, setShowDialog] = React.useState(false);
+  const [contacts, setContacts] = React.useState([]);
+
+  React.useEffect(() => {
+    instance
+      .get("/contacts")
+      .then((response) => {
+        setContacts(response.data?.contacts);
+      })
+      .catch((error) => console.log(error));
+  }, []);
 
   const [contact, setContact] = React.useState({
     nom: "",
@@ -106,7 +122,7 @@ const ContactScreen = () => {
           }}
         >
           <DataGrid
-            rows={rows}
+            rows={contacts}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[6]}
