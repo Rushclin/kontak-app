@@ -1,6 +1,6 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-
+let id = 0;
 let contacts: any[] = [];
 
 // CREATE INSTANCE OF AXIOS-MOCK-ADAPTERS
@@ -34,11 +34,9 @@ mock.onGet("/contact").reply((config) => {
 // TO POST ONE CONTACT
 mock.onPost("/contact").reply((config) => {
   //contacts.push(JSON.parse(config.data))
-  let id = contacts.length;
-  id++;
+  // let id = contacts.length == 0 ? 1 : contacts[contacts.length - 1].id++;
   let { data } = config;
   data = JSON.parse(data);
-  console.log(data?.params?.contact.nom, "NOMMMMM");
   const checkContact = () => {
     let dec = 0;
     contacts.map((contact) => {
@@ -58,7 +56,8 @@ mock.onPost("/contact").reply((config) => {
       },
     ];
   else {
-    contacts.push(data?.params?.contact);
+    contacts.push({ ...data?.params?.contact, id: id++ });
+    console.log(contacts);
     return [
       200,
       {
@@ -73,14 +72,18 @@ mock.onPost("/contact").reply((config) => {
 mock.onDelete("/contact").reply((config) => {
   const { id } = config.params;
   if (id > contacts.length) return [400];
-  else
+  else {
+    var removeContact = contacts.map((contact) => contact?.id).indexOf(id);
+    contacts.splice(removeContact, 1);
     return [
       200,
       {
-        contacts: contacts.filter((contact) => contact?.id !== id),
+        // contacts: contacts.filter((contact) => contact?.id !== id),
+        contacts: contacts,
         status: 200,
       },
     ];
+  }
 });
 
 export default instance;

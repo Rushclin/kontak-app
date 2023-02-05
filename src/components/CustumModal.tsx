@@ -90,7 +90,7 @@ const CustumModal = (props: any) => {
 
             <Autocomplete
               disablePortal
-              id="combo-box-demo"
+              id="pere"
               //options={autoCompleteValues?.nom}
               options={autoCompleteValues.map(
                 (value: any) => `${value?.nom} ${value?.prenom}`

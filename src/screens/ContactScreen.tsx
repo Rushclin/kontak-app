@@ -14,40 +14,14 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import React from "react";
 import instance from "../__mock__/api";
 import CustumModal from "../components/CustumModal";
-
-const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 20 },
-  { field: "nom", headerName: "NOM", width: 200 },
-  { field: "prenom", headerName: "PRENOM", width: 200 },
-  { field: "email", headerName: "EMAIL", width: 250 },
-  {
-    field: "actions",
-    headerName: "ACTIONS",
-    renderCell: (params) => {
-      return (
-        <ButtonGroup
-          variant="contained"
-          aria-label="outlined primary button group"
-        >
-          <IconButton
-            aria-label="show"
-            onClick={() => console.log("yui", params?.row?.id)}
-          >
-            <VisibilityIcon fontSize="small" color="primary" />
-          </IconButton>
-          <IconButton aria-label="delete" color="error">
-            <DeleteIcon fontSize="small" />
-          </IconButton>
-        </ButtonGroup>
-      );
-    },
-  },
-];
+import CustumDialog from "../components/CustumDialog";
 
 const ContactScreen = () => {
   const [showDialog, setShowDialog] = React.useState(false);
   const [contacts, setContacts] = React.useState([]);
   const [error, setError] = React.useState(false);
+  const [deleteDialog, setDeleteDialog] = React.useState(false);
+  const [deleteId, setDeleteId] = React.useState("");
 
   React.useEffect(() => {
     instance
@@ -65,9 +39,43 @@ const ContactScreen = () => {
     naissance: "",
     pere: "",
     mere: "",
-    id: 0,
-    label: "",
   });
+
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 20 },
+    { field: "nom", headerName: "NOM", width: 200 },
+    { field: "prenom", headerName: "PRENOM", width: 200 },
+    { field: "email", headerName: "EMAIL", width: 250 },
+    {
+      field: "actions",
+      headerName: "ACTIONS",
+      renderCell: (params) => {
+        return (
+          <ButtonGroup
+            variant="contained"
+            aria-label="outlined primary button group"
+          >
+            <IconButton
+              aria-label="show"
+              onClick={() => console.log("yui", params?.row?.id)}
+            >
+              <VisibilityIcon fontSize="small" color="primary" />
+            </IconButton>
+            <IconButton
+              aria-label="delete"
+              color="error"
+              onClick={() => {
+                setDeleteId(params.row?.id);
+                setDeleteDialog(true);
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </ButtonGroup>
+        );
+      },
+    },
+  ];
 
   const handleChange = (e: any) => {
     setContact((prevState) => ({
@@ -77,7 +85,6 @@ const ContactScreen = () => {
   };
 
   const handleClose = () => {
-    // setShowDialog(false);
     setContact({
       nom: "",
       prenom: "",
@@ -85,8 +92,6 @@ const ContactScreen = () => {
       naissance: "",
       pere: "",
       mere: "",
-      id: 0,
-      label: "",
     });
   };
 
@@ -94,8 +99,6 @@ const ContactScreen = () => {
     e.preventDefault();
     setContact((prevState) => ({
       ...prevState,
-      id: contacts.length + 1,
-      label: `Moi je suis toi`,
     }));
 
     instance
@@ -111,8 +114,6 @@ const ContactScreen = () => {
             naissance: "",
             pere: "",
             mere: "",
-            id: 0,
-            label: "",
           });
         } else {
           console.log(response);
@@ -121,6 +122,19 @@ const ContactScreen = () => {
       .catch((error) => {
         console.log("ECHEC", error);
         setError(true);
+      });
+  };
+
+  const handledelete = () => {
+    instance
+      .delete("/contact", { params: { id: deleteId } })
+      .then((response) => {
+        setContacts(response.data?.contacts);
+        setDeleteDialog(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setDeleteDialog(false);
       });
   };
 
@@ -190,6 +204,12 @@ const ContactScreen = () => {
             COMPRIS
           </Button>
         }
+      />
+
+      <CustumDialog
+        show={deleteDialog}
+        declineAction={() => setDeleteDialog(false)}
+        acceptAction={() => handledelete()}
       />
     </React.Fragment>
   );
