@@ -21,8 +21,11 @@ const CustumModal = (props: any) => {
     onClose,
     onSubmit,
     autoCompleteValues,
+    onEdit,
   } = props;
-  console.log("AUTO", autoCompleteValues);
+
+  console.log("ICI lE CONTACT", contact);
+  // console.log("AUTO", autoCompleteValues);
   const formRef = React.useRef(null);
 
   return (
@@ -34,11 +37,17 @@ const CustumModal = (props: any) => {
         sx={{ width: "100%" }}
         disableEscapeKeyDown={true}
       >
-        <DialogTitle>Creer un contact</DialogTitle>
+        <DialogTitle>
+          {" "}
+          {contact?.nom ? "Modifier le contact" : "Creer un contact"}{" "}
+        </DialogTitle>
         <ValidatorForm
           ref={formRef}
           onSubmit={(e) => {
-            onSubmit(e);
+            {
+              contact?.nom ? onEdit(e) : onSubmit(e);
+            }
+            // onSubmit(e);
           }}
           onError={() => {}}
         >
@@ -136,7 +145,7 @@ const CustumModal = (props: any) => {
               onClick={() => {}}
               type="submit"
             >
-              Enregistrer
+              {contact?.nom ? "Modifier" : "Enregistrer"}
             </Button>
           </DialogActions>
         </ValidatorForm>

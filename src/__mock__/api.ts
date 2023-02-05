@@ -57,7 +57,6 @@ mock.onPost("/contact").reply((config) => {
     ];
   else {
     contacts.push({ ...data?.params?.contact, id: id++ });
-    console.log(contacts);
     return [
       200,
       {
@@ -68,7 +67,7 @@ mock.onPost("/contact").reply((config) => {
   }
 });
 
-// TO DELETE ON CONTACT
+// TO DELETE ONE CONTACT
 mock.onDelete("/contact").reply((config) => {
   const { id } = config.params;
   if (id > contacts.length) return [400];
@@ -86,4 +85,37 @@ mock.onDelete("/contact").reply((config) => {
   }
 });
 
+// UPDATA FUNCTION
+mock.onPost("/contact/update").reply((config) => {
+  let { data } = config;
+  data = JSON.parse(data);
+
+  const checkContact = () => {
+    let dec = 0;
+    contacts.map((contact) => {
+      if (contact.nom.trim() === data?.params?.contact?.nom.trim()) {
+        dec = 1;
+      }
+    });
+    return dec === 1;
+  };
+  if (checkContact()) {
+    return [
+      400,
+      {
+        message: "Contact existant",
+        status: 400,
+      },
+    ];
+  } else {
+    contacts.push({ ...data?.params.contact });
+    return [
+      200,
+      {
+        contacts: contacts,
+        status: 200,
+      },
+    ];
+  }
+});
 export default instance;
