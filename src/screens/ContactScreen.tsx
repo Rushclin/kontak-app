@@ -6,7 +6,6 @@ import {
   Snackbar,
   Typography,
 } from "@mui/material";
-
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Box, Stack } from "@mui/system";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
@@ -21,8 +20,15 @@ const ContactScreen = () => {
   const [contacts, setContacts] = React.useState([]);
   const [error, setError] = React.useState(false);
   const [deleteDialog, setDeleteDialog] = React.useState(false);
-  const [selectID, setSelectID] = React.useState("");
-  const [editAction, setEditAction] = React.useState(false);
+  const [selectID, setSelectID] = React.useState(-1);
+  const [contact, setContact] = React.useState({
+    nom: "",
+    prenom: "",
+    email: "",
+    naissance: "",
+    pere: "",
+    mere: "",
+  });
 
   React.useEffect(() => {
     instance
@@ -32,15 +38,6 @@ const ContactScreen = () => {
       })
       .catch((error) => console.log(error));
   }, []);
-
-  /*   React.useEffect(() => {
-    if (selectID) {
-      instance
-        .get("/contact", { params: { id: selectID } })
-        .then((response) => console.log(response.data))
-        .catch((error) => console.log(error));
-    }
-  }, []); */
 
   const handleSelect = (id: number) => {
     instance
@@ -57,11 +54,8 @@ const ContactScreen = () => {
     instance
       .delete("/contact", { params: { id: selectID } })
       .then((response) => {
-        //setContacts(response.data?.contacts);
-        //setDeleteDialog(false);
-
         instance
-          .post("/contact/update", { params: { contact } })
+          .post("/contact/update", { params: { contact, id: selectID } })
           .then((response) => {
             console.log(response);
             if (response.status == 200) {
@@ -74,29 +68,106 @@ const ContactScreen = () => {
                 pere: "",
                 mere: "",
               });
+              setSelectID(-1);
+              setShowDialog(false);
             } else {
               console.log(response);
+              setSelectID(-1);
             }
           })
           .catch((error) => {
             console.log("ECHEC", error);
             setError(true);
+            setSelectID(-1);
+            setShowDialog(false);
           });
       })
       .catch((error) => {
         console.log(error);
-        //setDeleteDialog(false);
+        setShowDialog(false);
       });
   };
 
-  const [contact, setContact] = React.useState({
-    nom: "",
-    prenom: "",
-    email: "",
-    naissance: "",
-    pere: "",
-    mere: "",
-  });
+  const handledelete = () => {
+    instance
+      .delete("/contact", { params: { id: selectID } })
+      .then((response) => {
+        setContacts(response.data?.contacts);
+        setDeleteDialog(false);
+        setSelectID(-1);
+      })
+      .catch((error) => {
+        console.log(error);
+        setDeleteDialog(false);
+        setSelectID(-1);
+      });
+  };
+
+  const handleChange = (e: any) => {
+    setContact((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleChangePere = (e: any) => {
+    setContact((prevState) => ({
+      ...prevState,
+      [contact.pere]: e,
+    }));
+  };
+
+  const handleChangeMere = (e: any) => {
+    setContact((prevState) => ({
+      ...prevState,
+      [contact.mere]: e,
+    }));
+  };
+
+  const handleClose = () => {
+    setSelectID(-1);
+    setContact({
+      nom: "",
+      prenom: "",
+      email: "",
+      naissance: "",
+      pere: "",
+      mere: "",
+    });
+    setShowDialog(false);
+  };
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    setContact((prevState) => ({
+      ...prevState,
+    }));
+
+    instance
+      .post("/contact", { params: { contact } })
+      .then((response) => {
+        if (response.status == 200) {
+          setContacts(response.data?.contacts);
+          setContact({
+            nom: "",
+            prenom: "",
+            email: "",
+            naissance: "",
+            pere: "",
+            mere: "",
+          });
+          setShowDialog(false);
+        } else {
+          console.log(response);
+          setShowDialog(false);
+        }
+      })
+      .catch((error) => {
+        console.log("ECHEC", error);
+        setError(true);
+        //setShowDialog(false);
+      });
+  };
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 20 },
@@ -116,6 +187,8 @@ const ContactScreen = () => {
               aria-label="show"
               onClick={() => {
                 handleSelect(params?.row?.id);
+                setSelectID(params.row?.id);
+                console.log("PARAMS", params);
                 setShowDialog(true);
               }}
             >
@@ -126,6 +199,7 @@ const ContactScreen = () => {
               color="error"
               onClick={() => {
                 setSelectID(params.row?.id);
+                console.log("PARAMS", params);
                 setDeleteDialog(true);
               }}
             >
@@ -136,67 +210,6 @@ const ContactScreen = () => {
       },
     },
   ];
-
-  const handleChange = (e: any) => {
-    setContact((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleClose = () => {
-    setContact({
-      nom: "",
-      prenom: "",
-      email: "",
-      naissance: "",
-      pere: "",
-      mere: "",
-    });
-  };
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    setContact((prevState) => ({
-      ...prevState,
-    }));
-
-    instance
-      .post("/contact", { params: { contact } })
-      .then((response) => {
-        console.log(response);
-        if (response.status == 200) {
-          setContacts(response.data?.contacts);
-          setContact({
-            nom: "",
-            prenom: "",
-            email: "",
-            naissance: "",
-            pere: "",
-            mere: "",
-          });
-        } else {
-          console.log(response);
-        }
-      })
-      .catch((error) => {
-        console.log("ECHEC", error);
-        setError(true);
-      });
-  };
-
-  const handledelete = () => {
-    instance
-      .delete("/contact", { params: { id: selectID } })
-      .then((response) => {
-        setContacts(response.data?.contacts);
-        setDeleteDialog(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setDeleteDialog(false);
-      });
-  };
 
   return (
     <React.Fragment>
@@ -251,12 +264,15 @@ const ContactScreen = () => {
         onSubmit={handleSubmit}
         autoCompleteValues={contacts}
         onEdit={handleEdit}
+        idEdit={selectID}
+        handleChangePere={handleChangePere}
+        handleChangeMere={handleChangeMere}
       />
 
       <Snackbar
         open={error}
         autoHideDuration={6000}
-        message="Echec, nom deja pris"
+        message="Echec, le nom est déjà pris"
         action={
           <Button
             color="secondary"

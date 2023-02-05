@@ -1,4 +1,3 @@
-import { TextField } from "@mui/material";
 import { TextValidator } from "react-material-ui-form-validator";
 
 const CustumInput = (props: any) => {
@@ -22,12 +21,13 @@ const CustumInput = (props: any) => {
       type={type}
       fullWidth
       value={value}
-      variant="standard"
+      //variant="standard"
       name={name}
       onChange={onChangeText}
       validators={validators}
       errorMessages={errorMessages}
       size="small"
+      autoComplete="none"
     />
   );
 };

@@ -85,7 +85,7 @@ mock.onDelete("/contact").reply((config) => {
   }
 });
 
-// UPDATA FUNCTION
+// UPDATE FUNCTION
 mock.onPost("/contact/update").reply((config) => {
   let { data } = config;
   data = JSON.parse(data);

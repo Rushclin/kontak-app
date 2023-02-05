@@ -22,11 +22,12 @@ const CustumModal = (props: any) => {
     onSubmit,
     autoCompleteValues,
     onEdit,
+    idEdit,
+    handleChangePere,
+    handleChangeMere,
   } = props;
-
-  console.log("ICI lE CONTACT", contact);
-  // console.log("AUTO", autoCompleteValues);
   const formRef = React.useRef(null);
+  console.log(formRef);
 
   return (
     <React.Fragment>
@@ -38,16 +39,14 @@ const CustumModal = (props: any) => {
         disableEscapeKeyDown={true}
       >
         <DialogTitle>
-          {" "}
-          {contact?.nom ? "Modifier le contact" : "Creer un contact"}{" "}
+          {idEdit >= 0 ? "Modifier le contact" : "Creer un contact"}
         </DialogTitle>
         <ValidatorForm
           ref={formRef}
           onSubmit={(e) => {
             {
-              contact?.nom ? onEdit(e) : onSubmit(e);
+              idEdit >= 0 ? onEdit(e) : onSubmit(e);
             }
-            // onSubmit(e);
           }}
           onError={() => {}}
         >
@@ -79,7 +78,7 @@ const CustumModal = (props: any) => {
             <CustumInput
               value={contact.naissance}
               id="naissance"
-              label="Date de naissance"
+              label=""
               type="date"
               name="naissance"
               onChangeText={handleChange}
@@ -100,31 +99,41 @@ const CustumModal = (props: any) => {
             <Autocomplete
               disablePortal
               id="pere"
-              //options={autoCompleteValues?.nom}
+              onInputChange={handleChangePere}
               options={autoCompleteValues.map(
                 (value: any) => `${value?.nom} ${value?.prenom}`
               )}
               renderInput={(params) => (
-                <TextField variant="standard" {...params} label="Nom du pere" />
+                <TextField
+                  {...params}
+                  label="Nom du pere"
+                  margin="dense"
+                  id="pere"
+                  name="pere"
+                  value={contact.pere}
+                  onChange={handleChange}
+                />
               )}
             />
 
             <Autocomplete
               disablePortal
-              //options={autoCompleteValues?.nom}
               options={autoCompleteValues.map(
                 (value: any) => `${value?.nom} ${value?.prenom}`
               )}
-              onInputChange={handleChange}
               id="mere"
+              inputValue={contact.mere}
+              onInputChange={handleChangeMere}
               renderInput={(params) => (
-                <>
-                  <TextField
-                    variant="standard"
-                    {...params}
-                    label="Nom de la mere"
-                  />
-                </>
+                <TextField
+                  {...params}
+                  label="Nom de la mere"
+                  margin="dense"
+                  id="mere"
+                  name="mere"
+                  value={contact.mere}
+                  onChange={handleChange}
+                />
               )}
             />
           </DialogContent>
@@ -145,7 +154,7 @@ const CustumModal = (props: any) => {
               onClick={() => {}}
               type="submit"
             >
-              {contact?.nom ? "Modifier" : "Enregistrer"}
+              {idEdit >= 0 ? "Modifier" : "Enregistrer"}
             </Button>
           </DialogActions>
         </ValidatorForm>
