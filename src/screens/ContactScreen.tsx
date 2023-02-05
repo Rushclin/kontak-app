@@ -66,6 +66,7 @@ const ContactScreen = () => {
     pere: "",
     mere: "",
     id: 0,
+    label: "",
   });
 
   const handleChange = (e: any) => {
@@ -85,13 +86,16 @@ const ContactScreen = () => {
       pere: "",
       mere: "",
       id: 0,
+      label: "",
     });
   };
+
   const handleSubmit = (e: any) => {
     e.preventDefault();
     setContact((prevState) => ({
       ...prevState,
       id: contacts.length + 1,
+      label: `Moi je suis toi`,
     }));
 
     instance
@@ -108,6 +112,7 @@ const ContactScreen = () => {
             pere: "",
             mere: "",
             id: 0,
+            label: "",
           });
         } else {
           console.log(response);
@@ -170,6 +175,7 @@ const ContactScreen = () => {
         handleChange={handleChange}
         onClose={handleClose}
         onSubmit={handleSubmit}
+        autoCompleteValues={contacts}
       />
       <Snackbar
         open={error}

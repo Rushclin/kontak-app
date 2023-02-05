@@ -1,10 +1,12 @@
 import {
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  TextField,
 } from "@mui/material";
 import React from "react";
 import { ValidatorForm } from "react-material-ui-form-validator";
@@ -18,8 +20,9 @@ const CustumModal = (props: any) => {
     handleChange,
     onClose,
     onSubmit,
+    autoCompleteValues,
   } = props;
-  // const {nom, naissance, } = contact
+  console.log("AUTO", autoCompleteValues);
   const formRef = React.useRef(null);
 
   return (
@@ -83,6 +86,37 @@ const CustumModal = (props: any) => {
               onChangeText={handleChange}
               validators={["required", "isEmail"]}
               errorMessages={["Ce champ est obligatoire", "Email non valide"]}
+            />
+
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              //options={autoCompleteValues?.nom}
+              options={autoCompleteValues.map(
+                (value: any) => `${value?.nom} ${value?.prenom}`
+              )}
+              renderInput={(params) => (
+                <TextField variant="standard" {...params} label="Nom du pere" />
+              )}
+            />
+
+            <Autocomplete
+              disablePortal
+              //options={autoCompleteValues?.nom}
+              options={autoCompleteValues.map(
+                (value: any) => `${value?.nom} ${value?.prenom}`
+              )}
+              onInputChange={handleChange}
+              id="mere"
+              renderInput={(params) => (
+                <>
+                  <TextField
+                    variant="standard"
+                    {...params}
+                    label="Nom de la mere"
+                  />
+                </>
+              )}
             />
           </DialogContent>
           <DialogActions>
