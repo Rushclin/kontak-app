@@ -1,10 +1,20 @@
 import { TextField } from "@mui/material";
+import { TextValidator } from "react-material-ui-form-validator";
 
 const CustumInput = (props: any) => {
-  const { value, id, label, type, name, onChangeText } = props;
+  const {
+    value,
+    id,
+    label,
+    type,
+    name,
+    onChangeText,
+    validators,
+    errorMessages,
+  } = props;
 
   return (
-    <TextField
+    <TextValidator
       autoFocus
       margin="dense"
       id={id}
@@ -15,6 +25,9 @@ const CustumInput = (props: any) => {
       variant="standard"
       name={name}
       onChange={onChangeText}
+      validators={validators}
+      errorMessages={errorMessages}
+      size="small"
     />
   );
 };

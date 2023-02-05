@@ -1,10 +1,10 @@
 import { Container } from "@mui/system";
 import React from "react";
 import "./App.css";
-import ContactScreen from "./screens/ContactScreen";
-import instance from "./__mock__/api";
 
-function App() {
+import ContactScreen from "./screens/ContactScreen";
+
+const App = () => {
   React.useEffect(() => {
     // instance
     //   .post("/contacts", null)
@@ -31,6 +31,6 @@ function App() {
       <ContactScreen />
     </Container>
   );
-}
+};
 
 export default App;

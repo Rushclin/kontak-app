@@ -1,36 +1,22 @@
-import styled from "@emotion/styled";
 import {
   Button,
   ButtonGroup,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Divider,
-  Grid,
   IconButton,
-  Modal,
-  Paper,
-  TextField,
+  Snackbar,
   Typography,
 } from "@mui/material";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Box, Stack } from "@mui/system";
-import {
-  DataGrid,
-  GridColDef,
-  GridValueGetterParams,
-  renderActionsCell,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import React from "react";
-import CustumInput from "../components/CustumInput";
 import instance from "../__mock__/api";
+import CustumModal from "../components/CustumModal";
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 10 },
+  { field: "id", headerName: "ID", width: 20 },
   { field: "nom", headerName: "NOM", width: 200 },
   { field: "prenom", headerName: "PRENOM", width: 200 },
   { field: "email", headerName: "EMAIL", width: 250 },
@@ -61,6 +47,7 @@ const columns: GridColDef[] = [
 const ContactScreen = () => {
   const [showDialog, setShowDialog] = React.useState(false);
   const [contacts, setContacts] = React.useState([]);
+  const [error, setError] = React.useState(false);
 
   React.useEffect(() => {
     instance
@@ -75,9 +62,10 @@ const ContactScreen = () => {
     nom: "",
     prenom: "",
     email: "",
-    naissance: undefined,
-    pere: undefined,
-    mere: undefined,
+    naissance: "",
+    pere: "",
+    mere: "",
+    id: 0,
   });
 
   const handleChange = (e: any) => {
@@ -85,6 +73,50 @@ const ContactScreen = () => {
       ...prevState,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const handleClose = () => {
+    // setShowDialog(false);
+    setContact({
+      nom: "",
+      prenom: "",
+      email: "",
+      naissance: "",
+      pere: "",
+      mere: "",
+      id: 0,
+    });
+  };
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    setContact((prevState) => ({
+      ...prevState,
+      id: contacts.length + 1,
+    }));
+
+    instance
+      .post("/contact", { params: { contact } })
+      .then((response) => {
+        console.log(response);
+        if (response.status == 200) {
+          setContacts(response.data?.contacts);
+          setContact({
+            nom: "",
+            prenom: "",
+            email: "",
+            naissance: "",
+            pere: "",
+            mere: "",
+            id: 0,
+          });
+        } else {
+          console.log(response);
+        }
+      })
+      .catch((error) => {
+        console.log("ECHEC", error);
+        setError(true);
+      });
   };
 
   return (
@@ -131,68 +163,28 @@ const ContactScreen = () => {
         </Box>
       </Box>
 
-      <Dialog
-        fullWidth={true}
-        open={showDialog}
-        onClose={() => setShowDialog(false)}
-        sx={{ width: "100%" }}
-      >
-        <DialogTitle>Creer un contact</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Entrez les informations necessaires
-          </DialogContentText>
-
-          <CustumInput
-            value={contact.nom}
-            id="nom"
-            label="Nom"
-            type="text"
-            name="nom"
-            onChangeText={handleChange}
-          />
-          <CustumInput
-            value={contact.prenom}
-            id="prenom"
-            label="Prenom"
-            type="text"
-            name="prenom"
-            onChangeText={handleChange}
-          />
-          <CustumInput
-            value={contact.naissance}
-            id="naissance"
-            label="Date de naissance"
-            type="date"
-            name="date"
-            onChangeText={handleChange}
-          />
-          <CustumInput
-            value={contact.email}
-            id="email"
-            label="Email"
-            type="email"
-            name="email"
-            onChangeText={handleChange}
-          />
-        </DialogContent>
-        <DialogActions>
+      <CustumModal
+        contact={contact}
+        showDialog={showDialog}
+        setShowDialog={setShowDialog}
+        handleChange={handleChange}
+        onClose={handleClose}
+        onSubmit={handleSubmit}
+      />
+      <Snackbar
+        open={error}
+        autoHideDuration={6000}
+        message="Echec, nom deja pris"
+        action={
           <Button
-            variant="outlined"
-            color="error"
-            onClick={() => setShowDialog(false)}
+            color="secondary"
+            size="small"
+            onClick={() => setError(false)}
           >
-            Annuler
+            COMPRIS
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setShowDialog(false)}
-          >
-            Enregistrer
-          </Button>
-        </DialogActions>
-      </Dialog>
+        }
+      />
     </React.Fragment>
   );
 };
